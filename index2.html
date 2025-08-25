@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Medidas de Sostenibilidad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%);
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1280px;
+            margin: auto;
+            padding: 2rem;
+        }
+        .card-container {
+            transition: all 0.3s ease;
+        }
+        .card-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .progress-bar {
+            height: 1.5rem;
+            border-radius: 9999px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4ade80, #22c55e);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.75rem;
+            color: white;
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.2) 100%);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s ease-out;
+        }
+        .accordion-content.open {
+            max-height: 2000px;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+        .accordion-button svg {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-button.open svg {
+            transform: rotate(180deg);
+        }
+        .filter-card {
+            transition: all 0.3s ease;
+        }
+        .filter-card:hover {
+            transform: translateY(-2px);
+        }
+        .action-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .filter-select {
+            transition: all 0.2s ease;
+        }
+        .filter-select:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6; /* Blue color for spinner */
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .detail-item {
+            transition: all 0.2s ease;
+        }
+        .detail-item:hover {
+            background-color: rgba(243, 244, 246, 0.7);
+            padding-left: 0.5rem;
+            border-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-4 md:p-8">
+        <!-- Header con diseño mejorado -->
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-center text-blue-700 mb-4 tracking-tight">
+                Análisis de Medidas de Sostenibilidad
+            </h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                Explora las medidas de sostenibilidad implementadas en diferentes regiones y comunas para promover el desarrollo sostenible.
+            </p>
+        </header>
+
+        <!-- Filter section con diseño mejorado -->
+        <nav class="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-200 filter-card">
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 md:space-x-6">
+                <!-- Indicador de filtros activos -->
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+                    <span class="text-sm font-medium text-gray-600">Filtros anidados</span>
+                </div>
+                
+                <!-- Grupo de filtros -->
+                <div class="flex flex-col md:flex-row flex-wrap items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
+                    <!-- Filtro 1: Tipo de Medida -->
+                    <div class="flex flex-col space-y-2 w-full md:w-56">
+                        <label for="filter-tipo-medida" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <i class="fas fa-filter mr-2 text-blue-500"></i>
+                            Tipo de Medida
+                        </label>
+                        <div class="relative">
+                            <select id="filter-tipo-medida" class="filter-select w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white">
+                                <option value="Todos">Todos</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtro 2: Transformaciones -->
+                    <div class="flex flex-col space-y-2 w-full md:w-56" id="transformaciones-container">
+                        <label for="filter-transformaciones" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <i class="fas fa-sync-alt mr-2 text-green-500"></i>
+                            Transformaciones
+                        </label>
+                        <div class="relative">
+                            <select id="filter-transformaciones" class="filter-select w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none bg-white">
+                                <option value="Todos">Todos</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtro 3: Región -->
+                    <div class="flex flex-col space-y-2 w-full md:w-56" id="region-container">
+                        <label for="filter-region" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <i class="fas fa-globe-americas mr-2 text-yellow-500"></i>
+                            Región
+                        </label>
+                        <div class="relative">
+                            <select id="filter-region" class="filter-select w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none bg-white">
+                                <option value="Todos">Todos</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtro 4: Comuna -->
+                    <div class="flex flex-col space-y-2 w-full md:w-56" id="comuna-container">
+                        <label for="filter-comuna" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-red-500"></i>
+                            Comuna
+                        </label>
+                        <div class="relative">
+                            <select id="filter-comuna" class="filter-select w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 appearance-none bg-white">
+                                <option value="Todos">Todos</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reset button con diseño mejorado -->
+                <button id="reset-filters" class="flex items-center justify-center p-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-300 w-full md:w-auto mt-4 md:mt-0 shadow-sm">
+                    <i class="fas fa-redo-alt mr-2"></i>
+                    Reiniciar Filtros
+                </button>
+            </div>
+            
+            <!-- Indicador de estado de carga -->
+            <div id="loading-indicator" class="hidden mt-4 flex items-center justify-center">
+                <div class="loading-spinner mr-2"></div>
+                <span class="text-sm text-gray-600">Aplicando filtros...</span>
+            </div>
+        </nav>
+        
+        <!-- Contador de resultados -->
+        <div class="mb-6 flex justify-between items-center">
+            <div id="results-counter" class="text-gray-600 font-medium">
+                Mostrando <span id="results-count">0</span> medidas de sostenibilidad
+            </div>
+        </div>
+        
+        <!-- Cards Container -->
+        <div id="cards-container" class="grid grid-cols-1 gap-6"></div>
+        
+        <!-- Empty state -->
+        <div id="empty-state" class="hidden text-center py-12">
+            <div class="mb-4 flex justify-center">
+                <i class="fas fa-search text-5xl text-gray-300"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">No se encontraron resultados</h3>
+            <p class="text-gray-500 max-w-md mx-auto">
+                Intenta ajustar tus filtros para encontrar medidas de sostenibilidad que coincidan con tus criterios.
+            </p>
+        </div>
+    </div>
+    
+    <script src="data_medida.js"></script>
+    
+    <script>
+        // Transforma los datos en un formato de array más usable
+        const transformedData = Object.keys(data.Medida).map(key => ({
+            medida: data.Medida[key],
+            tipoMedida: data['Tipo de medida'][key],
+            acciones: data.Acciones[key],
+            descripcion: data['Descripción de la accion'][key],
+            areaResponsable: data['Área municipal responsable'][key],
+            colaboradores: data.Colaboradores[key],
+            fuentesFinanciamiento: data['Posibles fuentes de financiamiento'][key],
+            otrosMedios: data['Otros medios de implementación'][key],
+            indicadores: data['Indicadores de orientación'][key],
+            medioVerificacion: data['Medio de verificación'][key],
+            plazoMaximo: data['Plazo máximo'][key],
+            costo: data.Costo[key],
+            transformaciones: data.Transformaciones[key],
+            region: data.region[key],
+            comuna: data.Comuna[key],
+            porcentaje: Math.floor(Math.random() * 100) // Porcentaje de avance aleatorio para demostración
+        }));
+        
+        const cardsContainer = document.getElementById('cards-container');
+        const filterTipoMedida = document.getElementById('filter-tipo-medida');
+        const filterTransformaciones = document.getElementById('filter-transformaciones');
+        const filterRegion = document.getElementById('filter-region');
+        const filterComuna = document.getElementById('filter-comuna');
+        const resetButton = document.getElementById('reset-filters');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const resultsCount = document.getElementById('results-count');
+        const emptyState = document.getElementById('empty-state');
+        
+        // Mapeo de colores basado en el tipo de medida
+        const colorMap = {
+            'Adaptación - Mitigación': { 
+                headerBg: 'bg-gradient-to-r from-green-600 to-emerald-700', 
+                headerText: 'text-white', 
+                contentBg: 'bg-green-50', 
+                icon: 'text-white',
+                badge: 'bg-green-100 text-green-800'
+            },
+            'Adaptación': { 
+                headerBg: 'bg-gradient-to-r from-blue-700 to-indigo-800', 
+                headerText: 'text-white', 
+                contentBg: 'bg-blue-50', 
+                icon: 'text-white',
+                badge: 'bg-blue-100 text-blue-800'
+            },
+            'Mitigación': { 
+                headerBg: 'bg-gradient-to-r from-orange-600 to-amber-700', 
+                headerText: 'text-white', 
+                contentBg: 'bg-orange-50', 
+                icon: 'text-white',
+                badge: 'bg-orange-100 text-orange-800'
+            },
+            'Transversal': { 
+                headerBg: 'bg-gradient-to-r from-purple-600 to-violet-700', 
+                headerText: 'text-white', 
+                contentBg: 'bg-purple-50', 
+                icon: 'text-white',
+                badge: 'bg-purple-100 text-purple-800'
+            }
+        };
+        
+        // Función para renderizar los cards basados en los datos filtrados
+        function renderCards(dataToRender) {
+            cardsContainer.innerHTML = '';
+            resultsCount.textContent = dataToRender.length;
+            
+            if (dataToRender.length === 0) {
+                cardsContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            cardsContainer.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            const groupedData = dataToRender.reduce((acc, current) => {
+                if (!acc[current.medida]) acc[current.medida] = [];
+                acc[current.medida].push(current);
+                return acc;
+            }, {});
+            
+            Object.keys(groupedData).forEach(medidaTitle => {
+                const actions = groupedData[medidaTitle];
+                const tipoMedida = actions[0].tipoMedida;
+                const colors = colorMap[tipoMedida] || { 
+                    headerBg: 'bg-gradient-to-r from-gray-700 to-gray-800', 
+                    headerText: 'text-white', 
+                    contentBg: 'bg-gray-50', 
+                    icon: 'text-white',
+                    badge: 'bg-gray-100 text-gray-800'
+                };
+                
+                const accordionItem = document.createElement('div');
+                accordionItem.className = `rounded-2xl shadow-xl card-container overflow-hidden border border-gray-200`;
+                
+                const accordionHeader = document.createElement('button');
+                accordionHeader.className = `accordion-button w-full flex items-center justify-between p-6 cursor-pointer focus:outline-none ${colors.headerBg}`;
+                accordionHeader.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-leaf mr-3 ${colors.icon}"></i>
+                        <h2 class="text-xl md:text-2xl font-bold ${colors.headerText} text-left">${medidaTitle}</h2>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="badge ${colors.badge}">${actions.length} ${actions.length === 1 ? 'acción' : 'acciones'}</span>
+                        <svg class="w-6 h-6 ${colors.icon} transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                `;
+                
+                const accordionContent = document.createElement('div');
+                accordionContent.className = `accordion-content px-6 ${colors.contentBg}`;
+                
+                actions.forEach(action => {
+                    const actionCard = document.createElement('div');
+                    actionCard.className = 'action-card rounded-xl p-5 mb-5 border border-gray-200 bg-white bg-opacity-70';
+                    
+                    const detailsList = document.createElement('ul');
+                    detailsList.className = 'list-none space-y-3 text-sm md:text-base text-gray-700';
+                    
+                    const addDetail = (label, value, icon) => {
+                        if (!value) return;
+                        const listItem = document.createElement('li');
+                        listItem.className = 'detail-item flex items-start';
+                        listItem.innerHTML = `
+                            <div class="w-6 h-6 flex items-center justify-center mr-2 flex-shrink-0"><i class="${icon} text-gray-500"></i></div>
+                            <span class="font-semibold w-40 flex-shrink-0 text-gray-900">${label}:</span>
+                            <span class="flex-grow">${value}</span>
+                        `;
+                        detailsList.appendChild(listItem);
+                    };
+                    
+                    addDetail('Región', action.region, 'fas fa-globe-americas');
+                    addDetail('Comuna', action.comuna, 'fas fa-map-marker-alt');
+                    addDetail('Transformaciones', action.transformaciones, 'fas fa-sync-alt');
+                    addDetail('Tipo de Medida', action.tipoMedida, 'fas fa-filter');
+                    addDetail('Acciones', action.acciones, 'fas fa-tasks');
+                    addDetail('Descripción', action.descripcion, 'fas fa-align-left');
+                    addDetail('Área Responsable', action.areaResponsable, 'fas fa-user-tie');
+                    addDetail('Colaboradores', action.colaboradores, 'fas fa-users');
+                    addDetail('Plazo Máximo', action.plazoMaximo, 'fas fa-calendar-alt');
+                    addDetail('Costo', action.costo || 'No especificado', 'fas fa-money-bill-wave');
+                    
+                    actionCard.appendChild(detailsList);
+                    
+                    const progressBarContainer = document.createElement('div');
+                    progressBarContainer.className = 'mt-5';
+                    progressBarContainer.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-sm font-semibold text-gray-700">Porcentaje de Avance</p>
+                            <span class="text-sm font-medium text-gray-600">${action.porcentaje}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${action.porcentaje}%;">${action.porcentaje > 10 ? action.porcentaje + '%' : ''}</div>
+                        </div>
+                    `;
+                    
+                    actionCard.appendChild(progressBarContainer);
+                    accordionContent.appendChild(actionCard);
+                });
+                
+                accordionItem.appendChild(accordionHeader);
+                accordionItem.appendChild(accordionContent);
+                cardsContainer.appendChild(accordionItem);
+                
+                accordionHeader.addEventListener('click', () => {
+                    const isOpen = accordionContent.classList.contains('open');
+                    document.querySelectorAll('.accordion-content.open').forEach(content => {
+                        content.classList.remove('open');
+                        content.previousElementSibling.classList.remove('open');
+                    });
+                    if (!isOpen) {
+                        accordionContent.classList.add('open');
+                        accordionHeader.classList.add('open');
+                    }
+                });
+            });
+        }
+        
+        // Función para actualizar las opciones de un select
+        function updateSelectOptions(selectElement, newValues) {
+            const currentValue = selectElement.value;
+            selectElement.innerHTML = '<option value="Todos">Todos</option>';
+            const uniqueValues = [...new Set(newValues)].sort();
+            
+            uniqueValues.forEach(value => {
+                if (value) {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectElement.appendChild(option);
+                }
+            });
+            
+            selectElement.value = uniqueValues.includes(currentValue) ? currentValue : 'Todos';
+        }
+        
+        // Función principal para aplicar filtros y actualizar opciones en cascada
+        function applyFilters() {
+            loadingIndicator.classList.remove('hidden');
+
+            // --- Obtener selecciones actuales ---
+            let selectedTipoMedida = filterTipoMedida.value;
+            let selectedTransformaciones = filterTransformaciones.value;
+            let selectedRegion = filterRegion.value;
+            let selectedComuna = filterComuna.value;
+
+            // --- Actualizar opciones de los filtros ---
+            // Para cada filtro, se calculan sus posibles opciones basándose en los otros filtros seleccionados.
+            
+            const optionsData = transformedData.filter(item => 
+                (selectedTransformaciones === 'Todos' || item.transformaciones === selectedTransformaciones) &&
+                (selectedRegion === 'Todos' || item.region === selectedRegion) &&
+                (selectedComuna === 'Todos' || item.comuna === selectedComuna)
+            );
+            updateSelectOptions(filterTipoMedida, optionsData.map(item => item.tipoMedida));
+            selectedTipoMedida = filterTipoMedida.value; // Re-leer en caso de que se haya reseteado
+
+            const transformacionesData = transformedData.filter(item => 
+                (selectedTipoMedida === 'Todos' || item.tipoMedida === selectedTipoMedida) &&
+                (selectedRegion === 'Todos' || item.region === selectedRegion) &&
+                (selectedComuna === 'Todos' || item.comuna === selectedComuna)
+            );
+            updateSelectOptions(filterTransformaciones, transformacionesData.map(item => item.transformaciones));
+            selectedTransformaciones = filterTransformaciones.value;
+
+            const regionData = transformedData.filter(item => 
+                (selectedTipoMedida === 'Todos' || item.tipoMedida === selectedTipoMedida) &&
+                (selectedTransformaciones === 'Todos' || item.transformaciones === selectedTransformaciones) &&
+                (selectedComuna === 'Todos' || item.comuna === selectedComuna)
+            );
+            updateSelectOptions(filterRegion, regionData.map(item => item.region));
+            selectedRegion = filterRegion.value;
+
+            const comunaData = transformedData.filter(item => 
+                (selectedTipoMedida === 'Todos' || item.tipoMedida === selectedTipoMedida) &&
+                (selectedTransformaciones === 'Todos' || item.transformaciones === selectedTransformaciones) &&
+                (selectedRegion === 'Todos' || item.region === selectedRegion)
+            );
+            updateSelectOptions(filterComuna, comunaData.map(item => item.comuna));
+            selectedComuna = filterComuna.value;
+
+            // --- Filtrar datos para renderizar ---
+            const finalFilteredData = transformedData.filter(item =>
+                (selectedTipoMedida === 'Todos' || item.tipoMedida === selectedTipoMedida) &&
+                (selectedTransformaciones === 'Todos' || item.transformaciones === selectedTransformaciones) &&
+                (selectedRegion === 'Todos' || item.region === selectedRegion) &&
+                (selectedComuna === 'Todos' || item.comuna === selectedComuna)
+            );
+            
+            setTimeout(() => {
+                renderCards(finalFilteredData);
+                loadingIndicator.classList.add('hidden');
+            }, 300);
+        }
+        
+        // Función para inicializar los filtros al cargar la página
+        function initializeFilters() {
+            updateSelectOptions(filterTipoMedida, transformedData.map(item => item.tipoMedida));
+            updateSelectOptions(filterTransformaciones, transformedData.map(item => item.transformaciones));
+            updateSelectOptions(filterRegion, transformedData.map(item => item.region));
+            updateSelectOptions(filterComuna, transformedData.map(item => item.comuna));
+        }
+        
+        // --- Event listeners ---
+        filterTipoMedida.addEventListener('change', applyFilters);
+        filterTransformaciones.addEventListener('change', applyFilters);
+        filterRegion.addEventListener('change', applyFilters);
+        filterComuna.addEventListener('change', applyFilters);
+        
+        resetButton.addEventListener('click', () => {
+            filterTipoMedida.value = 'Todos';
+            filterTransformaciones.value = 'Todos';
+            filterRegion.value = 'Todos';
+            filterComuna.value = 'Todos';
+            initializeFilters(); // Repoblar todas las opciones
+            applyFilters(); // Renderizar todo
+        });
+        
+        // --- Carga inicial ---
+        initializeFilters();
+        applyFilters();
+    </script>
+</body>
+</html>
