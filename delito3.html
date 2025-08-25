@@ -58,12 +58,11 @@
         }
         .chart-container {
             position: relative;
-            height: 400px; /* Adjusted height for better visibility */
+            height: 400px;
             width: 100%;
         }
-        /* Custom header styles */
         .hero-header {
-            background: linear-gradient(135deg, #4c51bf 0%, #6b46c1 100%); /* Purple gradient */
+            background: linear-gradient(135deg, #4c51bf 0%, #6b46c1 100%);
             color: #ffffff;
             padding: 40px 20px;
             border-radius: 15px;
@@ -72,23 +71,21 @@
             margin-bottom: 30px;
         }
         .hero-header h1 {
-            font-size: 3.5rem; /* Larger font size */
-            font-weight: 800; /* Extra bold */
-            letter-spacing: -0.05em; /* Tighter letter spacing */
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Text shadow */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         .hero-header p {
-            font-size: 1.25rem; /* Slightly larger paragraph */
+            font-size: 1.25rem;
             opacity: 0.9;
             margin-bottom: 5px;
         }
         .hero-header .source-info {
-            font-size: 0.875rem; /* Smaller source info */
+            font-size: 0.875rem;
             opacity: 0.7;
         }
-
-        /* Styles for the new metric cards */
         .metric-card {
             background-color: #ffffff;
             border-radius: 12px;
@@ -99,10 +96,10 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 120px; /* Ensure consistent height */
+            min-height: 120px;
         }
         .metric-card .icon {
-            font-size: 2.5rem; /* Large icon size */
+            font-size: 2.5rem;
             margin-bottom: 8px;
         }
         .metric-card .title {
@@ -112,36 +109,73 @@
             margin-bottom: 4px;
         }
         .metric-card .value {
-            font-size: 1.6rem; /* Value font size adjusted for multiple lines */
+            font-size: 1.6rem;
             font-weight: 700;
-            color: #2c5282; /* Default value color */
-            line-height: 1.2; /* Adjust line height for multiline values */
+            color: #2c5282;
+            line-height: 1.2;
         }
         .metric-card .value.green {
-            color: #2f855a; /* Green for positive trends */
+            color: #2f855a;
         }
         .metric-card .value.red {
-            color: #e53e3e; /* Red for negative trends */
+            color: #e53e3e;
         }
-
-
         @media (max-width: 768px) {
             .grid-cols-2 {
                 grid-template-columns: 1fr;
             }
             .hero-header h1 {
-                font-size: 2.5rem; /* Adjust for smaller screens */
+                font-size: 2.5rem;
             }
             .hero-header p {
                 font-size: 1rem;
             }
             .metric-card .value {
-                font-size: 1.5rem; /* Further adjust for smaller screens */
+                font-size: 1.5rem;
             }
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4c51bf;
+            animation: spin 1s ease infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
+    <div class="loading-overlay" id="loadingOverlay">
+        <div>
+            <div class="spinner"></div>
+            <p class="text-center text-gray-700">Cargando datos...</p>
+        </div>
+    </div>
     <div class="container">
         <!-- Encabezado Elaborado -->
         <header class="hero-header">
@@ -149,15 +183,16 @@
             <p class="text-xl">Análisis interactivo de frecuencias de delitos por temporalidad.</p>
             <p class="source-info mt-4">Datos extraídos de la Plataforma de Información Ley STOP de Carabineros de Chile, sistematizados por el Instituto Libertad.</p>
         </header>
-
+        
         <!-- Análisis Textual General -->
         <div class="card mb-6">
             <h2 class="text-2xl font-semibold mb-4 text-gray-700">Visión General de la Situación Delictual Anual en Copiapó (2023-2025)</h2>
             <div id="generalAnalysis" class="bg-gray-50 border-l-4 border-gray-300 text-gray-800 p-4 rounded-md">
-                <!-- Content will be dynamically generated by JavaScript -->
+                <div class="spinner"></div>
+                <p class="text-center text-gray-700">Cargando análisis general...</p>
             </div>
         </div>
-
+        
         <main>
             <!-- Selector de Temporalidad -->
             <div class="card mb-6">
@@ -168,78 +203,71 @@
                     <button id="tabWeekly" class="tab-button">Semanal</button>
                 </div>
             </div>
-
+            
             <!-- Contenedor de Gráficos Anual -->
             <div id="annualContent" class="temporal-content">
                 <div class="card">
                     <h2 class="text-2xl font-semibold mb-4 text-gray-700">Frecuencia de Delitos - Comparativa Anual (2023-2025)</h2>
                     <p class="text-gray-600 mb-4">Explora las tendencias anuales de los delitos en Copiapó. Puedes seleccionar un delito específico para ver su evolución.</p>
-
                     <div class="mb-6 flex flex-col md:flex-row items-center gap-4">
                         <label for="annualCrimeSelect" class="font-medium text-gray-700">Seleccionar Delito:</label>
-                        <select id="annualCrimeSelect" class="filter-select w-full md:w-auto">
-                            <!-- Options will be populated by JavaScript -->
+                        <select id="annualCrimeSelect" class="filter-select w-full md:w-auto" disabled>
+                            <option value="">Cargando datos...</option>
                         </select>
                     </div>
-
                     <div class="chart-container">
                         <canvas id="annualChart"></canvas>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Contenedor de Gráficos Mensual -->
             <div id="monthlyContent" class="temporal-content hidden">
                 <div class="card">
                     <h2 class="text-2xl font-semibold mb-4 text-gray-700">Frecuencia de Delitos - Comparativa Mensual (2024 vs. 2025)</h2>
                     <p class="text-gray-600 mb-4">Observa la distribución mensual de los delitos, comparando el comportamiento entre 2024 y 2025 (proyectado).</p>
-
                     <div class="mb-6 flex flex-col md:flex-row items-center gap-4">
                         <label for="monthlyCrimeSelect" class="font-medium text-gray-700">Seleccionar Delito:</label>
-                        <select id="monthlyCrimeSelect" class="filter-select w-full md:w-auto">
-                            <!-- Options will be populated by JavaScript -->
+                        <select id="monthlyCrimeSelect" class="filter-select w-full md:w-auto" disabled>
+                            <option value="">Cargando datos...</option>
                         </select>
                     </div>
-
                     <div class="chart-container">
                         <canvas id="monthlyChart"></canvas>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Contenedor de Gráficos Semanal -->
             <div id="weeklyContent" class="temporal-content hidden">
                 <div class="card">
                     <h2 class="text-2xl font-semibold mb-4 text-gray-700">Frecuencia de Delitos - Comparativa Semanal (2024 vs. 2025)</h2>
-                    <p class="text-gray-600 mb-4">Analiza las fluctuaciones recientes semana a semana, comparando las últimas 12 semanas disponibles de 2024 y 2025.</p>
-
+                    <p class="text-gray-600 mb-4">Analiza las fluctuaciones recientes semana a semana, comparando las últimas semanas disponibles de 2024 y 2025.</p>
                     <div class="mb-6 flex flex-col md:flex-row items-center gap-4">
                         <label for="weeklyCrimeSelect" class="font-medium text-gray-700">Seleccionar Delito:</label>
-                        <select id="weeklyCrimeSelect" class="filter-select w-full md:w-auto">
-                            <!-- Options will be populated by JavaScript -->
+                        <select id="weeklyCrimeSelect" class="filter-select w-full md:w-auto" disabled>
+                            <option value="">Cargando datos...</option>
                         </select>
                     </div>
-
                     <div class="chart-container">
                         <canvas id="weeklyChart"></canvas>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Sección de Análisis Textual Dinámico -->
             <div class="card mt-6">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Análisis de Tendencias Específicas</h2>
                 <div id="dynamicAnalysis" class="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 rounded-md">
-                    <!-- Dynamic analysis text will be inserted here by JavaScript -->
-                    <p>Seleccione una temporalidad y un delito para ver el análisis.</p>
+                    <div class="spinner"></div>
+                    <p class="text-center text-blue-800">Cargando análisis...</p>
                 </div>
             </div>
-
+            
             <!-- Sección de Ilustraciones y Explicaciones -->
             <div class="card">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Métricas Clave de Delincuencia</h2>
                 <div id="keyMetricsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Metrics will be dynamically inserted here -->
                     <div class="metric-card">
                         <span class="icon">📅</span>
                         <h4 class="title">Total Casos 2024</h4>
@@ -277,7 +305,7 @@
                     </div>
                     <div class="metric-card">
                         <span class="icon">💀</span>
-                        <h4 class="title">Homicidios y Femicidios (Semana 12 2025)</h4>
+                        <h4 class="title">Homicidios y Femicidios (Última Semana 2025)</h4>
                         <p class="value" id="metric8">Cargando...</p>
                     </div>
                 </div>
@@ -296,90 +324,87 @@
                         <p class="text-gray-600 mt-2">Es crucial considerar el <strong>contexto</strong>: cambios en las leyes, operaciones policiales específicas, factores socioeconómicos, o incluso eventos estacionales pueden influir en estas cifras.</p>
                         <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded-md">
                             <p class="font-semibold">💡 Dato Clave:</p>
-                            <p>Las cifras reales de 2025 están disponibles hasta julio para la vista mensual y las últimas 12 semanas para la semanal. Los valores posteriores a julio en el gráfico mensual de 2025 son <strong>proyecciones</strong> basadas en el promedio de los meses ya reportados de 2025, y se visualizan con una **línea segmentada**.</p>
+                            <p>Las cifras reales de 2025 están disponibles hasta julio para la vista mensual y las últimas semanas disponibles para la semanal. Los valores posteriores en el gráfico mensual de 2025 son <strong>proyecciones</strong> basadas en el promedio de los meses ya reportados de 2025, y se visualizan con una **línea segmentada**.</p>
                         </div>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Sección de "Acerca de" o pie de página -->
             <footer class="text-center text-gray-500 text-sm mt-8">
                 <p>&copy; 2025 Instituto Libertad. Datos proporcionados por Carabineros de Chile (Plataforma Ley STOP).</p>
             </footer>
         </main>
     </div>
-
     <script>
-        // Data from the provided CSV snippets (hardcoded for simplicity in this example)
-        // In a real application, this would be dynamically loaded from the files.
-
-        const params = new URLSearchParams(window.location.search);
-        const codcomParam = params.get("codcom")?.trim() || "13101";
-        //const dataURL = `https://raw.githubusercontent.com/Sud-Austral/TRANSPARENCIA_FACIL_WEB/refs/heads/main/data/${encodeURIComponent(codcomParam)}.json`;
-        const dataURL = "https://raw.githubusercontent.com/Sud-Austral/MEDIDA_REGIONES_COMUNA/refs/heads/main/data2/10101.json";
-
-        async function loadData() {
-            try {
-                const response = await fetch(dataURL);
-                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-                const rawData = await response.json();
-            }
-            catch (error) {
-                
-            }
-
-
-        const annualDataRaw =getData1()
-        const monthlyDataRaw = getData2()
-        const weeklyDataRaw = getData3()
-
-        const crimeTypes = [...new Set(annualDataRaw.map(d => d.Delito))].sort(); // Get unique crime types
-
+        // Variables globales para almacenar los datos
+        let annualDataRaw = [];
+        let monthlyDataRaw = [];
+        let weeklyDataRaw = [];
+        let crimeTypes = [];
+        
         // Chart instances
         let annualChartInstance;
         let monthlyChartInstance;
         let weeklyChartInstance;
-
-        let currentTemporality = 'Annual'; // Track active tab for analysis generation
-
+        let currentTemporality = 'Annual';
+        
+        // Funciones para obtener datos (simuladas - reemplazar con tus implementaciones reales)
+        async function getData1() {
+            const dataURL = "https://raw.githubusercontent.com/Sud-Austral/MEDIDA_REGIONES_COMUNA/refs/heads/main/data2/10101.json";
+            // Simular una llamada asíncrona (por ejemplo, fetch)
+            const response = await fetch(dataURL);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            //const rawData = await 
+            return response.json();
+        }
+        async function getData2() {
+            return 
+        }
+        async function getData3() {
+            return 
+        }
+        
         // Populate dropdowns
         function populateCrimeSelects() {
             const annualSelect = document.getElementById('annualCrimeSelect');
             const monthlyCrimeSelect = document.getElementById('monthlyCrimeSelect');
             const weeklyCrimeSelect = document.getElementById('weeklyCrimeSelect');
-
+            
             annualSelect.innerHTML = '<option value="All">Todos los Delitos (Suma)</option>';
             monthlyCrimeSelect.innerHTML = '<option value="All">Todos los Delitos (Suma)</option>';
             weeklyCrimeSelect.innerHTML = '<option value="All">Todos los Delitos (Suma)</option>';
-
+            
             crimeTypes.forEach(crime => {
                 const option1 = document.createElement('option');
                 option1.value = crime;
                 option1.textContent = crime;
                 annualSelect.appendChild(option1);
-
+                
                 const option2 = document.createElement('option');
                 option2.value = crime;
                 option2.textContent = crime;
                 monthlyCrimeSelect.appendChild(option2);
-
+                
                 const option3 = document.createElement('option');
                 option3.value = crime;
                 option3.textContent = crime;
                 weeklyCrimeSelect.appendChild(option3);
             });
+            
+            // Habilitar los selectores después de cargar los datos
+            annualSelect.disabled = false;
+            monthlyCrimeSelect.disabled = false;
+            weeklyCrimeSelect.disabled = false;
         }
-
+        
         // Function to generate the general analysis text
         function generateGeneralAnalysisText() {
             const total2023 = annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2023"], 0);
             const total2024 = annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2024"], 0);
             const total2025Partial = annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2025 (a la fecha)"], 0);
-
             let contentHTML = `<p class="mb-2">El presente análisis ofrece una visión general de la evolución delictual en la Comuna de Copiapó, basándose en la frecuencia total de casos reportados para los años 2023, 2024 y los datos parciales de 2025 hasta la fecha de este informe. La información recopilada abarca una diversidad de delitos, desde aquellos de alta connotación social como Homicidios y Femicidios, hasta delitos contra la propiedad, violencia intrafamiliar e incivilidades.</p>`;
-
             contentHTML += `<ul class="list-disc list-inside space-y-2 text-gray-700">`;
-
             // Cifras generales
             contentHTML += `<li><strong>Cifras Anuales Totales:</strong>`;
             contentHTML += `<ul>`;
@@ -388,7 +413,6 @@
             contentHTML += `<li>Hasta la fecha en 2025, se han reportado <strong>${total2025Partial.toLocaleString('es-CL')}</strong> casos.</li>`;
             contentHTML += `</ul>`;
             contentHTML += `</li>`;
-
             // Tendencia general anual
             let trendText = '';
             if (total2023 > 0 && total2024 > 0) {
@@ -404,32 +428,25 @@
                  trendText += `La información para 2025 aún es limitada para establecer una tendencia clara.`;
             }
             contentHTML += `<li><strong>Tendencia General Anual:</strong> ${trendText}</li>`;
-
             // Análisis de delitos más/menos frecuentes (basado en 2024, como año completo más reciente)
             let crimeFrequencies = annualDataRaw.map(d => ({
                 delito: d.Delito,
                 total: d["Frecuencia 2024"]
             }));
             crimeFrequencies.sort((a, b) => b.total - a.total);
-
             const mostFrequentCrime = crimeFrequencies[0];
-            const secondMostFrequentCrime = crimeFrequencies[1]; // Get second most frequent
+            const secondMostFrequentCrime = crimeFrequencies[1];
             const leastFrequentCrime = crimeFrequencies[crimeFrequencies.length - 1];
-            const secondLeastFrequentCrime = crimeFrequencies[crimeFrequencies.length - 2]; // Get second least frequent
-
-
+            const secondLeastFrequentCrime = crimeFrequencies[crimeFrequencies.length - 2];
             contentHTML += `<li><strong>Delitos Más y Menos Frecuentes (2024):</strong>`;
             contentHTML += `<ul>`;
             contentHTML += `<li>Los delitos más frecuentes incluyen: <strong>${mostFrequentCrime.delito}</strong> con <strong>${mostFrequentCrime.total.toLocaleString('es-CL')}</strong> casos y <strong>${secondMostFrequentCrime.delito}</strong> con <strong>${secondMostFrequentCrime.total.toLocaleString('es-CL')}</strong> casos.</li>`;
             contentHTML += `</ul>`;
             contentHTML += `</li>`;
-
-
             // Análisis de meses con más/menos frecuencia (basado en 2025 actual y 2024 completo)
             const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            let monthlyTotals2025 = new Array(7).fill(0); // Only up to July for 2025 actual
+            let monthlyTotals2025 = new Array(7).fill(0);
             let monthlyTotals2024 = new Array(12).fill(0);
-
             monthlyDataRaw.forEach(d => {
                 if (d.Año === 2025) {
                     for (let i = 0; i < 7; i++) {
@@ -445,14 +462,10 @@
                     }
                 }
             });
-
             const maxMonth2025Index = monthlyTotals2025.indexOf(Math.max(...monthlyTotals2025));
             const minMonth2025Index = monthlyTotals2025.indexOf(Math.min(...monthlyTotals2025));
-
             const maxMonth2024Index = monthlyTotals2024.indexOf(Math.max(...monthlyTotals2024));
             const minMonth2024Index = monthlyTotals2024.indexOf(Math.min(...monthlyTotals2024));
-
-
             contentHTML += `<li><strong>Patrones Mensuales (Frecuencia Total):</strong>`;
             contentHTML += `<ul>`;
             contentHTML += `<li>En 2024, el mes con <strong>mayor frecuencia</strong> fue <strong>${months[maxMonth2024Index]}</strong> (${monthlyTotals2024[maxMonth2024Index].toLocaleString('es-CL')} casos).</li>`;
@@ -462,51 +475,46 @@
             }
             contentHTML += `</ul>`;
             contentHTML += `</li>`;
-
             contentHTML += `</ul>`;
             document.getElementById('generalAnalysis').innerHTML = contentHTML;
         }
-
-
+        
         // Function to generate dynamic analysis text
         function generateAnalysisText(temporality, selectedCrime) {
             let analysisText = "";
             let dataName = selectedCrime === 'All' ? 'Todos los delitos' : selectedCrime;
-
+            
             if (temporality === 'Annual') {
                 const data = annualDataRaw.find(d => d.Delito === selectedCrime) || {};
                 const total2023 = selectedCrime === 'All' ? annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2023"], 0) : data["Frecuencia 2023"] || 0;
                 const total2024 = selectedCrime === 'All' ? annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2024"], 0) : data["Frecuencia 2024"] || 0;
                 const total2025 = selectedCrime === 'All' ? annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2025 (a la fecha)"], 0) : data["Frecuencia 2025 (a la fecha)"] || 0;
-
+                
                 analysisText += `Análisis Anual para <strong>${dataName}</strong>:\n\n`;
                 analysisText += `En 2023, se registraron <strong>${total2023.toLocaleString('es-CL')}</strong> casos. Para 2024, la cifra fue de <strong>${total2024.toLocaleString('es-CL')}</strong> casos. Hasta la fecha en 2025, se han reportado <strong>${total2025.toLocaleString('es-CL')}</strong> casos.\n\n`;
-
+                
                 const change23_24 = total2023 > 0 ? ((total2024 - total2023) / total2023 * 100).toFixed(1) : (total2024 > 0 ? "un aumento significativo" : "sin cambios");
                 const change24_25 = total2024 > 0 ? ((total2025 - total2024) / total2024 * 100).toFixed(1) : (total2025 > 0 ? "un aumento significativo" : "sin cambios");
-
+                
                 if (change23_24 !== "sin cambios") {
                     analysisText += `Se observó un <strong>${change23_24 > 0 ? 'aumento' : 'disminución'}</strong> del <strong>${Math.abs(change23_24)}%</strong> entre 2023 y 2024. `;
                 } else {
                      analysisText += `La tendencia se mantuvo estable entre 2023 y 2024. `;
                 }
-
+                
                 if (change24_25 !== "sin cambios") {
                     analysisText += `Entre 2024 y 2025 (a la fecha), se registró un <strong>${change24_25 > 0 ? 'aumento' : 'disminución'}</strong> del <strong>${Math.abs(change24_25)}%</strong>.`;
                 } else {
                      analysisText += `Entre 2024 y 2025 (a la fecha), no hubo variaciones significativas.`;
                 }
-
-
             } else if (temporality === 'Monthly') {
                 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
                 let data2024 = [];
-                let data2025Actual = []; // Stores actual 2025 data points
-                let sum2025Reported = 0; // Initialize here
-                let count2025Reported = 0; // Initialize here
-                let currentMonthIndex = -1; // Initialize here
-
-                // Re-calculate data to ensure consistency with chart rendering
+                let data2025Actual = [];
+                let sum2025Reported = 0;
+                let count2025Reported = 0;
+                let currentMonthIndex = -1;
+                
                 if (selectedCrime === 'All') {
                     months.forEach(month => {
                         const sum24 = monthlyDataRaw.filter(d => d.Año === 2024 && d[month] !== undefined).reduce((acc, d) => acc + d[month], 0);
@@ -534,15 +542,15 @@
                         }
                     });
                 }
-
+                
                 const average2025 = count2025Reported > 0 ? sum2025Reported / count2025Reported : 0;
-
+                
                 analysisText += `Análisis Mensual para <strong>${dataName}</strong>:\n\n`;
                 analysisText += `Comparativa entre 2024 y 2025 (hasta <strong>${months[currentMonthIndex || 0]}</strong>):\n`;
-
+                
                 let total2024Partial = data2024.slice(0, currentMonthIndex + 1).reduce((sum, val) => sum + val, 0);
                 let total2025Partial = data2025Actual.slice(0, currentMonthIndex + 1).reduce((sum, val) => sum + val, 0);
-
+                
                 if (total2024Partial > 0) {
                      const changePartial = ((total2025Partial - total2024Partial) / total2024Partial * 100).toFixed(1);
                      analysisText += `Se observa un <strong>${changePartial > 0 ? 'incremento' : 'decremento'}</strong> del <strong>${Math.abs(changePartial)}%</strong> en 2025 respecto al mismo período de 2024.\n`;
@@ -551,105 +559,129 @@
                 } else {
                     analysisText += `Las cifras son <strong>consistentes</strong> en ambos años para el período analizado.\n`;
                 }
-
-
+                
                 // Identify peak and low for 2024
                 const max2024 = Math.max(...data2024);
                 const min2024 = Math.min(...data2024);
                 const maxMonth2024 = months[data2024.indexOf(max2024)];
                 const minMonth2024 = months[data2024.indexOf(min2024)];
+                
                 analysisText += `En 2024, el mes con mayor frecuencia fue <strong>${maxMonth2024}</strong> (<strong>${max2024.toLocaleString('es-CL')}</strong> casos), y el de menor fue <strong>${minMonth2024}</strong> (<strong>${min2024.toLocaleString('es-CL')}</strong> casos).\n`;
-
+                
                 // Identify peak and low for 2025 actual data
                 const actual2025Values = data2025Actual.slice(0, currentMonthIndex + 1);
                 if (actual2025Values.length > 0) {
                     const max2025Actual = Math.max(...actual2025Values);
                     const min2025Actual = Math.min(...actual2025Values);
                     const maxMonth2025Actual = months[data2025Actual.indexOf(max2025Actual)];
-                    const minMonth2025Actual = months[actual2025Values.indexOf(min2025Actual)]; // Corrected index for minMonth2025Actual
+                    const minMonth2025Actual = months[actual2025Values.indexOf(min2025Actual)];
+                    
                     analysisText += `Hasta el momento en 2025, el mes de mayor incidencia fue <strong>${maxMonth2025Actual}</strong> (<strong>${max2025Actual.toLocaleString('es-CL')}</strong> casos), y el de menor fue <strong>${minMonth2025Actual}</strong> (<strong>${min2025Actual.toLocaleString('es-CL')}</strong> casos).\n\n`;
                 }
-
-
+                
                 analysisText += `La proyección para los meses restantes de 2025 (a partir de <strong>${months[currentMonthIndex + 1] || 'Agosto'}</strong>) es de aproximadamente <strong>${Math.round(average2025).toLocaleString('es-CL')}</strong> casos por mes, con base en el promedio de los meses ya reportados de 2025.`;
-
-
             } else if (temporality === 'Weekly') {
-                const weeks = Array.from({ length: 12 }, (_, i) => `Semana ${String(i + 1).padStart(2, '0')}`);
+                // Extraer todas las claves de semana disponibles de los datos
+                const allWeekKeys = Object.keys(weeklyDataRaw[0] || {})
+                    .filter(key => key.includes('SEMANA'));
+                
+                // Separar las semanas por año
+                const weeks2024 = allWeekKeys.filter(key => key.includes('2024'));
+                const weeks2025 = allWeekKeys.filter(key => key.includes('2025'));
+                
+                // Ordenar las semanas correctamente
+                weeks2024.sort((a, b) => {
+                    const weekA = parseInt(a.split(' ')[2]);
+                    const weekB = parseInt(b.split(' ')[2]);
+                    return weekA - weekB;
+                });
+                
+                weeks2025.sort((a, b) => {
+                    const weekA = parseInt(a.split(' ')[2]);
+                    const weekB = parseInt(b.split(' ')[2]);
+                    return weekA - weekB;
+                });
+                
+                // Preparar datos para el análisis
                 let data2024 = [];
                 let data2025 = [];
-                let currentWeekIndex = -1; // Assuming data is available up to currentWeekIndex
-
-                const year2024DataFiltered = weeklyDataRaw.filter(d => d.Año === 2024);
-                const year2025DataFiltered = weeklyDataRaw.filter(d => d.Año === 2025);
-
+                
                 if (selectedCrime === 'All') {
-                    weeks.forEach((week, index) => {
-                        const sum24 = year2024DataFiltered.filter(d => d[week] !== undefined).reduce((acc, d) => acc + d[week], 0);
-                        data2024.push(sum24);
-
-                        const sum25 = year2025DataFiltered.filter(d => d[week] !== undefined).reduce((acc, d) => acc + d[week], 0);
-                        data2025.push(sum25);
-                        if (sum25 > 0) { // Assume data is present up to the last non-zero week
-                           currentWeekIndex = index;
-                        }
+                    // Para todos los delitos, sumar los valores de cada semana
+                    weeks2024.forEach(week => {
+                        const sum = weeklyDataRaw
+                            .filter(d => d[week] !== undefined)
+                            .reduce((acc, d) => acc + d[week], 0);
+                        data2024.push(sum);
+                    });
+                    
+                    weeks2025.forEach(week => {
+                        const sum = weeklyDataRaw
+                            .filter(d => d[week] !== undefined)
+                            .reduce((acc, d) => acc + d[week], 0);
+                        data2025.push(sum);
                     });
                 } else {
-                    const crimeData2024 = year2024DataFiltered.find(d => d.Delito === selectedCrime);
-                    const crimeData2025 = year2025DataFiltered.find(d => d.Delito === selectedCrime);
-
-                    weeks.forEach((week, index) => {
-                        const val24 = (crimeData2024 && crimeData2024[week] !== undefined) ? crimeData2024[week] : 0;
-                        data2024.push(val24);
-                        const val25 = (crimeData2025 && crimeData2025[week] !== undefined) ? crimeData2025[week] : 0;
-                        data2025.push(val25);
-                        if (val25 > 0) {
-                            currentWeekIndex = index;
-                        }
+                    // Para un delito específico, obtener los valores de cada semana
+                    const crimeData2024 = weeklyDataRaw.find(d => d.Delito === selectedCrime && d.año === 2024);
+                    const crimeData2025 = weeklyDataRaw.find(d => d.Delito === selectedCrime && d.año === 2025);
+                    
+                    weeks2024.forEach(week => {
+                        data2024.push(crimeData2024 && crimeData2024[week] !== undefined ? crimeData2024[week] : 0);
+                    });
+                    
+                    weeks2025.forEach(week => {
+                        data2025.push(crimeData2025 && crimeData2025[week] !== undefined ? crimeData2025[week] : 0);
                     });
                 }
-
+                
+                // Obtener las últimas 12 semanas para el análisis
+                const last12Weeks2024 = data2024.slice(-12);
+                const last12Weeks2025 = data2025.slice(-12);
+                
                 analysisText += `Análisis Semanal para <strong>${dataName}</strong>:\n\n`;
-                analysisText += `Análisis de las semanas disponibles en 2024 y 2025 (hasta la <strong>Semana ${currentWeekIndex + 1}</strong>):\n`;
-
-                let total2024Partial = data2024.slice(0, currentWeekIndex + 1).reduce((sum, val) => sum + val, 0);
-                let total2025Partial = data2025.slice(0, currentWeekIndex + 1).reduce((sum, val) => sum + val, 0);
-
-                if (total2024Partial > 0) {
-                    const changePartial = ((total2025Partial - total2024Partial) / total2024Partial * 100).toFixed(1);
-                    analysisText += `Se observa un <strong>${changePartial > 0 ? 'incremento' : 'decremento'}</strong> del <strong>${Math.abs(changePartial)}%</strong> en 2025 respecto al mismo período de 2024.\n`;
-                } else if (total2025Partial > 0) {
-                     analysisText += `Se ha registrado un <strong>aumento significativo</strong> en 2025 en comparación con el mismo período de 2024.\n`;
+                analysisText += `Análisis de las últimas 12 semanas disponibles:\n`;
+                
+                let total2024 = last12Weeks2024.reduce((sum, val) => sum + val, 0);
+                let total2025 = last12Weeks2025.reduce((sum, val) => sum + val, 0);
+                
+                if (total2024 > 0) {
+                    const change = ((total2025 - total2024) / total2024 * 100).toFixed(1);
+                    analysisText += `Se observa un <strong>${change > 0 ? 'incremento' : 'decremento'}</strong> del <strong>${Math.abs(change)}%</strong> en 2025 respecto al mismo período de 2024.\n`;
+                } else if (total2025 > 0) {
+                    analysisText += `Se ha registrado un <strong>aumento significativo</strong> en 2025 en comparación con el mismo período de 2024.\n`;
                 } else {
-                     analysisText += `Las cifras son <strong>consistentes</strong> en ambos años para el período analizado.\n`;
+                    analysisText += `Las cifras son <strong>consistentes</strong> en ambos años para el período analizado.\n`;
                 }
-
-                const max2024 = Math.max(...data2024.slice(0, currentWeekIndex + 1));
-                const min2024 = Math.min(...data2024.slice(0, currentWeekIndex + 1));
-                const maxWeek2024 = weeks[data2024.indexOf(max2024)];
-                const minWeek2024 = weeks[data2024.indexOf(min2024)];
-                analysisText += `En las semanas disponibles de 2024, el pico se alcanzó en <strong>${maxWeek2024}</strong> (<strong>${max2024.toLocaleString('es-CL')}</strong> casos) y el punto más bajo en <strong>${minWeek2024}</strong> (<strong>${min2024.toLocaleString('es-CL')}</strong> casos).\n`;
-
-                const max2025 = Math.max(...data2025.slice(0, currentWeekIndex + 1));
-                const min2025 = Math.min(...data2025.slice(0, currentWeekIndex + 1));
-                const maxWeek2025 = weeks[data2025.indexOf(max2025)];
-                const minWeek2025 = weeks[data2025.indexOf(min2025)];
-                analysisText += `Para 2025, en las semanas con datos, la semana con más casos fue la <strong>${maxWeek2025}</strong> (<strong>${max2025.toLocaleString('es-CL')}</strong> casos) y la de menor fue la <strong>${minWeek2025}</strong> (<strong>${min2025.toLocaleString('es-CL')}</strong> casos).`;
+                
+                const max2024 = Math.max(...last12Weeks2024);
+                const min2024 = Math.min(...last12Weeks2024);
+                const maxWeekIndex2024 = data2024.indexOf(max2024);
+                const minWeekIndex2024 = data2024.indexOf(min2024);
+                
+                analysisText += `En las últimas 12 semanas de 2024, el pico se alcanzó en la <strong>${weeks2024[maxWeekIndex2024]}</strong> (<strong>${max2024.toLocaleString('es-CL')}</strong> casos) y el punto más bajo en la <strong>${weeks2024[minWeekIndex2024]}</strong> (<strong>${min2024.toLocaleString('es-CL')}</strong> casos).\n`;
+                
+                const max2025 = Math.max(...last12Weeks2025);
+                const min2025 = Math.min(...last12Weeks2025);
+                const maxWeekIndex2025 = data2025.indexOf(max2025);
+                const minWeekIndex2025 = data2025.indexOf(min2025);
+                
+                analysisText += `Para 2025, en las últimas 12 semanas, la semana con más casos fue la <strong>${weeks2025[maxWeekIndex2025]}</strong> (<strong>${max2025.toLocaleString('es-CL')}</strong> casos) y la de menor fue la <strong>${weeks2025[minWeekIndex2025]}</strong> (<strong>${min2025.toLocaleString('es-CL')}</strong> casos).`;
             }
-
+            
             document.getElementById('dynamicAnalysis').innerHTML = `<p class="whitespace-pre-wrap">${analysisText}</p>`;
         }
-
+        
         // Function to calculate and display key metrics
         function updateKeyMetrics() {
             // 1. Total Casos 2024 (Año completo)
             const total2024 = annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2024"], 0);
             document.getElementById('metric1').textContent = total2024.toLocaleString('es-CL');
-
+            
             // 2. Total Casos 2025 (a la fecha)
             const total2025Partial = annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2025 (a la fecha)"], 0);
             document.getElementById('metric2').textContent = total2025Partial.toLocaleString('es-CL');
-
+            
             // 3. Delito Más Frecuente (2024)
             let crimeFrequencies2024 = annualDataRaw.map(d => ({
                 delito: d.Delito,
@@ -658,7 +690,7 @@
             crimeFrequencies2024.sort((a, b) => b.total - a.total);
             const mostFrequent2024 = crimeFrequencies2024[0];
             document.getElementById('metric3-value').innerHTML = `<strong>${mostFrequent2024.delito}</strong><br>(${mostFrequent2024.total.toLocaleString('es-CL')})`;
-
+            
             // 4. Delito Más Frecuente (2025 a la fecha)
             let crimeFrequencies2025 = annualDataRaw.map(d => ({
                 delito: d.Delito,
@@ -667,30 +699,27 @@
             crimeFrequencies2025.sort((a, b) => b.total - a.total);
             const mostFrequent2025 = crimeFrequencies2025[0];
             document.getElementById('metric4-value').innerHTML = `<strong>${mostFrequent2025.delito}</strong><br>(${mostFrequent2025.total.toLocaleString('es-CL')})`;
-
-
-            // --- NUEVA MÉTRICA: 5. Variación % (2025 vs Mismo Periodo 2024) ---
-            const monthsForComparison = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio"]; // Up to July for 2025 partial data
+            
+            // 5. Variación % (2025 vs Mismo Periodo 2024)
+            const monthsForComparison = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio"];
             let total2024_comparable = 0;
             monthlyDataRaw.filter(d => d.Año === 2024).forEach(crimeData => {
                 monthsForComparison.forEach(month => {
                     total2024_comparable += crimeData[month] || 0;
                 });
             });
-
             const rawChange25_vs_24partial = total2024_comparable > 0 ? ((total2025Partial - total2024_comparable) / total2024_comparable * 100) : NaN;
             const change25_vs_24partial = isNaN(rawChange25_vs_24partial) ? 'N/A' : rawChange25_vs_24partial.toFixed(1);
             const metric5Element = document.getElementById('metric5');
             metric5Element.textContent = `${change25_vs_24partial}%`;
             if (change25_vs_24partial !== 'N/A') {
-                metric5Element.classList.toggle('green', rawChange25_vs_24partial < 0); // Disminución de delitos es 'bueno'
-                metric5Element.classList.toggle('red', rawChange25_vs_24partial > 0);   // Aumento de delitos es 'malo'
+                metric5Element.classList.toggle('green', rawChange25_vs_24partial < 0);
+                metric5Element.classList.toggle('red', rawChange25_vs_24partial > 0);
             } else {
                 metric5Element.classList.remove('green', 'red');
             }
-
-
-            // --- REUBICADA Y RENOMBRADA: 6. Variación % Total (2024 vs 2023) ---
+            
+            // 6. Variación % Total (2024 vs 2023)
             const total2023 = annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2023"], 0);
             const rawChange24_vs_23 = total2023 > 0 ? ((total2024 - total2023) / total2023 * 100) : NaN;
             const change24_vs_23 = isNaN(rawChange24_vs_23) ? 'N/A' : rawChange24_vs_23.toFixed(1);
@@ -702,32 +731,43 @@
             } else {
                 metric6Element.classList.remove('green', 'red');
             }
-
-
+            
             // 7. Robos con Violencia (Último Mes 2025 - Julio)
             const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const robosViolenciaMonthly2025 = monthlyDataRaw.find(d => d.Año === 2025 && d.Delito === "ROBOS CON VIOLENCIA O INTIMIDACIÓN");
+            const robosViolenciaMonthly2025 = monthlyDataRaw.find(d => d.Año === 2025 && d.Delito === "ROBOS CON VIOLENCIA E INTIMIDACIÓN");
             const julioRobosViolencia = robosViolenciaMonthly2025 ? robosViolenciaMonthly2025["Julio"] : 0;
             document.getElementById('metric7').textContent = julioRobosViolencia.toLocaleString('es-CL');
-
-            // 8. Homicidios y Femicidios (Última Semana 2025 - Semana 12)
-            const weeks = Array.from({ length: 12 }, (_, i) => `Semana ${String(i + 1).padStart(2, '0')}`);
-            const homicidiosWeekly2025 = weeklyDataRaw.find(d => d.Año === 2025 && d.Delito === "HOMICIDIOS Y FEMICIDIOS");
-            const semana12Homicidios = homicidiosWeekly2025 ? homicidiosWeekly2025["Semana 12"] : 0;
-            document.getElementById('metric8').textContent = semana12Homicidios.toLocaleString('es-CL');
+            
+            // 8. Homicidios y Femicidios (Última Semana 2025)
+            // Encontrar la última semana disponible para 2025
+            const allWeekKeys = Object.keys(weeklyDataRaw[0] || {})
+                .filter(key => key.includes('2025') && key.includes('SEMANA'));
+            
+            // Ordenar las semanas para encontrar la última
+            allWeekKeys.sort((a, b) => {
+                const weekA = parseInt(a.split(' ')[2]);
+                const weekB = parseInt(b.split(' ')[2]);
+                return weekB - weekA; // Orden descendente para obtener la última semana primero
+            });
+            
+            const lastWeek2025 = allWeekKeys[0];
+            const homicidiosWeekly2025 = weeklyDataRaw.find(d => d.Delito === "HOMICIDIOS Y FEMICIDIOS" && d.año === 2025);
+            const lastWeekHomicidios = homicidiosWeekly2025 && lastWeek2025 ? homicidiosWeekly2025[lastWeek2025] : 0;
+            
+            document.getElementById('metric8').textContent = lastWeekHomicidios.toLocaleString('es-CL');
         }
-
+        
         // Render Annual Chart
         function renderAnnualChart(selectedCrime = 'All') {
             if (annualChartInstance) {
                 annualChartInstance.destroy();
             }
-
+            
             let labels = ['2023', '2024', '2025 (a la fecha)'];
             let data2023 = [];
             let data2024 = [];
             let data2025 = [];
-
+            
             if (selectedCrime === 'All') {
                 data2023 = [annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2023"], 0)];
                 data2024 = [annualDataRaw.reduce((sum, d) => sum + d["Frecuencia 2024"], 0)];
@@ -740,7 +780,7 @@
                     data2025 = [crimeData["Frecuencia 2025 (a la fecha)"]];
                 }
             }
-
+            
             const ctx = document.getElementById('annualChart').getContext('2d');
             annualChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -749,8 +789,8 @@
                     datasets: [
                         {
                             label: 'Frecuencia 2023',
-                            data: [data2023[0], 0, 0], // Only show 2023 data at 2023 bar
-                            backgroundColor: 'rgba(76, 81, 191, 0.7)', // Purple
+                            data: [data2023[0], 0, 0],
+                            backgroundColor: 'rgba(76, 81, 191, 0.7)',
                             borderColor: 'rgba(76, 81, 191, 1)',
                             borderWidth: 1,
                             barPercentage: 0.8,
@@ -758,8 +798,8 @@
                         },
                         {
                             label: 'Frecuencia 2024',
-                            data: [0, data2024[0], 0], // Only show 2024 data at 2024 bar
-                            backgroundColor: 'rgba(237, 137, 45, 0.7)', // Orange
+                            data: [0, data2024[0], 0],
+                            backgroundColor: 'rgba(237, 137, 45, 0.7)',
                             borderColor: 'rgba(237, 137, 45, 1)',
                             borderWidth: 1,
                             barPercentage: 0.8,
@@ -767,8 +807,8 @@
                         },
                         {
                             label: 'Frecuencia 2025 (a la fecha)',
-                            data: [0, 0, data2025[0]], // Only show 2025 data at 2025 bar
-                            backgroundColor: 'rgba(56, 178, 172, 0.7)', // Teal
+                            data: [0, 0, data2025[0]],
+                            backgroundColor: 'rgba(56, 178, 172, 0.7)',
                             borderColor: 'rgba(56, 178, 172, 1)',
                             borderWidth: 1,
                             barPercentage: 0.8,
@@ -816,78 +856,65 @@
                     }
                 }
             });
+            
             generateAnalysisText('Annual', selectedCrime);
         }
-
-        // Render Monthly Chart - Now Comparative with Projection for 2025 and segmented line
+        
+        // Render Monthly Chart
         function renderMonthlyChart(selectedCrime) {
             if (monthlyChartInstance) {
                 monthlyChartInstance.destroy();
             }
-
+            
             const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             let data2024 = [];
-            let data2025Actual = []; // Stores actual 2025 data points
+            let data2025Actual = [];
             let sum2025Reported = 0;
             let count2025Reported = 0;
-            let currentMonthIndex = -1; // Index of the last month with actual reported data > 0
-
-            // --- Process 2024 Data ---
+            let currentMonthIndex = -1;
+            
             if (selectedCrime === 'All') {
                 months.forEach(month => {
                     const sum = monthlyDataRaw
                         .filter(d => d.Año === 2024 && d[month] !== undefined)
                         .reduce((acc, d) => acc + d[month], 0);
                     data2024.push(sum);
-                });
-            } else {
-                const crimeData2024 = monthlyDataRaw.find(d => d.Año === 2024 && d.Delito === selectedCrime);
-                months.forEach(month => {
-                    data2024.push(crimeData2024 && crimeData2024[month] !== undefined ? crimeData2024[month] : 0);
-                });
-            }
-
-            // --- Process 2025 Actual Data and determine last reported month ---
-            // This loop populates data2025Actual with the real data, and tracks `currentMonthIndex`
-            if (selectedCrime === 'All') {
-                months.forEach((month, index) => {
+                    
                     const sumForMonth = monthlyDataRaw
                         .filter(d => d.Año === 2025 && d[month] !== undefined)
                         .reduce((acc, d) => acc + d[month], 0);
-
-                    data2025Actual.push(sumForMonth); // Store the actual sum (even if it's 0, it's a reported 0)
-
-                    if (sumForMonth > 0) { // Only count for average if there's actual positive data
+                    data2025Actual.push(sumForMonth);
+                    
+                    if (sumForMonth > 0) {
                         sum2025Reported += sumForMonth;
                         count2025Reported++;
-                        currentMonthIndex = index; // Update last month with positive actual data
+                        currentMonthIndex = months.indexOf(month);
                     }
                 });
             } else {
+                const crimeData2024 = monthlyDataRaw.find(d => d.Año === 2024 && d.Delito === selectedCrime);
                 const crimeData2025Specific = monthlyDataRaw.find(d => d.Año === 2025 && d.Delito === selectedCrime);
+                
                 months.forEach((month, index) => {
+                    data2024.push(crimeData2024 && crimeData2024[month] !== undefined ? crimeData2024[month] : 0);
                     const value = (crimeData2025Specific && crimeData2025Specific[month] !== undefined) ? crimeData2025Specific[month] : 0;
-                    data2025Actual.push(value); // Store the actual value (even if 0)
-
-                    if (value > 0) { // Only count for average if there's actual positive data
+                    data2025Actual.push(value);
+                    
+                    if (value > 0) {
                         sum2025Reported += value;
                         count2025Reported++;
                         currentMonthIndex = index;
                     }
                 });
             }
-
-            // Calculate average for reported months in 2025
+            
             const average2025 = count2025Reported > 0 ? sum2025Reported / count2025Reported : 0;
-
-            // Create the final data2025 array with projections
-            let data2025 = [...data2025Actual]; // Start with the collected actual data
-
-            // Project values for remaining months in 2025
+            let data2025 = [...data2025Actual];
+            
             for (let i = currentMonthIndex + 1; i < months.length; i++) {
-                data2025[i] = Math.round(average2025); // Use rounded average for projection
+                data2025[i] = Math.round(average2025);
             }
-
+            
             const ctx = document.getElementById('monthlyChart').getContext('2d');
             monthlyChartInstance = new Chart(ctx, {
                 type: 'line',
@@ -897,7 +924,7 @@
                         {
                             label: `Frecuencia 2024 (${selectedCrime === 'All' ? 'Total' : selectedCrime})`,
                             data: data2024,
-                            borderColor: '#4c51bf', // Purple
+                            borderColor: '#4c51bf',
                             backgroundColor: 'rgba(76, 81, 191, 0.2)',
                             fill: false,
                             tension: 0.3
@@ -905,31 +932,30 @@
                         {
                             label: `Frecuencia 2025 (Datos y Proyección) (${selectedCrime === 'All' ? 'Total' : selectedCrime})`,
                             data: data2025,
-                            borderColor: '#ed8936', // Base color, overridden by segment below
+                            borderColor: '#ed8936',
                             backgroundColor: 'rgba(237, 137, 45, 0.2)',
                             fill: false,
                             tension: 0.3,
                             segment: {
                                 borderColor: ctxSegment => {
-                                    // Make border solid for actual data, dashed for projected
                                     if (ctxSegment.p0DataIndex <= currentMonthIndex) {
-                                        return '#ed8936'; // Solid orange
+                                        return '#ed8936';
                                     }
-                                    return '#ed8936'; // Orange, but dashed
+                                    return '#ed8936';
                                 },
                                 borderDash: ctxSegment => {
                                     if (ctxSegment.p0DataIndex <= currentMonthIndex) {
-                                        return []; // Solid line
+                                        return [];
                                     }
-                                    return [5, 5]; // Dashed line
+                                    return [5, 5];
                                 },
                                 pointStyle: ctxSegment => {
                                     if (ctxSegment.dataIndex <= currentMonthIndex) {
-                                        return 'circle'; // Circle for actual points
+                                        return 'circle';
                                     }
-                                    return 'rect'; // Square for projected points
+                                    return 'rect';
                                 },
-                                radius: ctxSegment => { // Adjust radius for better visibility
+                                radius: ctxSegment => {
                                     if (ctxSegment.dataIndex <= currentMonthIndex) {
                                         return 5;
                                     }
@@ -959,7 +985,6 @@
                                     if (context.parsed.y !== null) {
                                         label += context.parsed.y;
                                     }
-                                    // Check if the current point is in the projected segment
                                     const isProjected = context.dataset.label.includes("2025") && context.dataIndex > currentMonthIndex;
                                     if (isProjected) {
                                         label += ' (Proyección)';
@@ -996,62 +1021,114 @@
                     }
                 }
             });
+            
             generateAnalysisText('Monthly', selectedCrime);
         }
-
-        // Render Weekly Chart - Now Comparative
+        
+        // Render Weekly Chart
         function renderWeeklyChart(selectedCrime) {
             if (weeklyChartInstance) {
                 weeklyChartInstance.destroy();
             }
-
-            const weeks = Array.from({ length: 12 }, (_, i) => `Semana ${String(i + 1).padStart(2, '0')}`);
+            
+            // Extraer todas las claves de semana disponibles de los datos
+            const allWeekKeys = Object.keys(weeklyDataRaw[0] || {})
+                .filter(key => key.includes('SEMANA'));
+            
+            // Separar las semanas por año
+            const weeks2024 = allWeekKeys.filter(key => key.includes('2024'));
+            const weeks2025 = allWeekKeys.filter(key => key.includes('2025'));
+            
+            // Ordenar las semanas correctamente
+            weeks2024.sort((a, b) => {
+                const weekA = parseInt(a.split(' ')[2]);
+                const weekB = parseInt(b.split(' ')[2]);
+                return weekA - weekB;
+            });
+            
+            weeks2025.sort((a, b) => {
+                const weekA = parseInt(a.split(' ')[2]);
+                const weekB = parseInt(b.split(' ')[2]);
+                return weekA - weekB;
+            });
+            
+            // Preparar datos para el gráfico
             let data2024 = [];
             let data2025 = [];
-
-            const year2024DataFiltered = weeklyDataRaw.filter(d => d.Año === 2024);
-            const year2025DataFiltered = weeklyDataRaw.filter(d => d.Año === 2025);
-
+            
             if (selectedCrime === 'All') {
-                weeks.forEach((week, index) => {
-                    const sum24 = year2024DataFiltered
+                // Para todos los delitos, sumar los valores de cada semana
+                weeks2024.forEach(week => {
+                    const sum = weeklyDataRaw
                         .filter(d => d[week] !== undefined)
                         .reduce((acc, d) => acc + d[week], 0);
-                    data2024.push(sum24);
-
-                    const sum25 = year2025DataFiltered
+                    data2024.push(sum);
+                });
+                
+                weeks2025.forEach(week => {
+                    const sum = weeklyDataRaw
                         .filter(d => d[week] !== undefined)
                         .reduce((acc, d) => acc + d[week], 0);
-                    data2025.push(sum25);
+                    data2025.push(sum);
                 });
             } else {
-                const crimeData2024 = year2024DataFiltered.find(d => d.Delito === selectedCrime);
-                const crimeData2025 = year2025DataFiltered.find(d => d.Delito === selectedCrime);
-
-                weeks.forEach(week => {
+                // Para un delito específico, obtener los valores de cada semana
+                const crimeData2024 = weeklyDataRaw.find(d => d.Delito === selectedCrime && d.año === 2024);
+                const crimeData2025 = weeklyDataRaw.find(d => d.Delito === selectedCrime && d.año === 2025);
+                
+                weeks2024.forEach(week => {
                     data2024.push(crimeData2024 && crimeData2024[week] !== undefined ? crimeData2024[week] : 0);
+                });
+                
+                weeks2025.forEach(week => {
                     data2025.push(crimeData2025 && crimeData2025[week] !== undefined ? crimeData2025[week] : 0);
                 });
             }
-
+            
+            // Preparar etiquetas para el gráfico (solo número de semana)
+            const labels2024 = weeks2024.map(week => week.split(' ')[2]);
+            const labels2025 = weeks2025.map(week => week.split(' ')[2]);
+            
+            // Determinar el número máximo de semanas para mostrar
+            const maxWeeks = Math.max(labels2024.length, labels2025.length);
+            
+            // Si hay más semanas en 2025, ajustamos las etiquetas para mostrar solo las últimas 12 semanas
+            let displayLabels = [];
+            let displayData2024 = [];
+            let displayData2025 = [];
+            
+            if (maxWeeks > 12) {
+                // Mostrar solo las últimas 12 semanas
+                const startIndex2024 = Math.max(0, labels2024.length - 12);
+                const startIndex2025 = Math.max(0, labels2025.length - 12);
+                
+                displayLabels = labels2025.slice(startIndex2025);
+                displayData2024 = data2024.slice(startIndex2024);
+                displayData2025 = data2025.slice(startIndex2025);
+            } else {
+                displayLabels = labels2025;
+                displayData2024 = data2024;
+                displayData2025 = data2025;
+            }
+            
             const ctx = document.getElementById('weeklyChart').getContext('2d');
             weeklyChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: weeks,
+                    labels: displayLabels,
                     datasets: [
                         {
                             label: `Frecuencia Semanal 2024 (${selectedCrime === 'All' ? 'Total' : selectedCrime})`,
-                            data: data2024,
-                            borderColor: '#38b2ac', // Teal
+                            data: displayData2024,
+                            borderColor: '#38b2ac',
                             backgroundColor: 'rgba(56, 178, 172, 0.2)',
                             fill: false,
                             tension: 0.3
                         },
                         {
-                            label: `Frecuencia Semanal 2025 (a la fecha) (${selectedCrime === 'All' ? 'Total' : selectedCrime})`,
-                            data: data2025,
-                            borderColor: '#6b46c1', // Darker Purple
+                            label: `Frecuencia Semanal 2025 (${selectedCrime === 'All' ? 'Total' : selectedCrime})`,
+                            data: displayData2025,
+                            borderColor: '#6b46c1',
                             backgroundColor: 'rgba(107, 70, 193, 0.2)',
                             fill: false,
                             tension: 0.3
@@ -1098,9 +1175,10 @@
                     }
                 }
             });
+            
             generateAnalysisText('Weekly', selectedCrime);
         }
-
+        
         // Event Listeners for tabs
         document.getElementById('tabAnnual').addEventListener('click', () => {
             document.querySelectorAll('.temporal-content').forEach(el => el.classList.add('hidden'));
@@ -1110,7 +1188,7 @@
             currentTemporality = 'Annual';
             renderAnnualChart(document.getElementById('annualCrimeSelect').value);
         });
-
+        
         document.getElementById('tabMonthly').addEventListener('click', () => {
             document.querySelectorAll('.temporal-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('monthlyContent').classList.remove('hidden');
@@ -1119,7 +1197,7 @@
             currentTemporality = 'Monthly';
             renderMonthlyChart(document.getElementById('monthlyCrimeSelect').value);
         });
-
+        
         document.getElementById('tabWeekly').addEventListener('click', () => {
             document.querySelectorAll('.temporal-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('weeklyContent').classList.remove('hidden');
@@ -1128,29 +1206,68 @@
             currentTemporality = 'Weekly';
             renderWeeklyChart(document.getElementById('weeklyCrimeSelect').value);
         });
-
+        
         // Event Listeners for filters
         document.getElementById('annualCrimeSelect').addEventListener('change', (event) => {
             renderAnnualChart(event.target.value);
         });
-
+        
         document.getElementById('monthlyCrimeSelect').addEventListener('change', (event) => {
             renderMonthlyChart(event.target.value);
         });
-
+        
         document.getElementById('weeklyCrimeSelect').addEventListener('change', (event) => {
             renderWeeklyChart(event.target.value);
         });
-
-        // Initial render
-        document.addEventListener('DOMContentLoaded', () => {
-            populateCrimeSelects();
-            generateGeneralAnalysisText(); // Generate initial general analysis
-            updateKeyMetrics(); // Generate and display key metrics
-            renderAnnualChart('All'); // Render annual chart by default
-            generateAnalysisText('Annual', 'All'); // Initial specific analysis text
-        });
-
+        
+        // Función principal asíncrona para inicializar la aplicación
+        async function initializeApp() {
+            try {
+                // Mostrar overlay de carga
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                
+                // Cargar todos los datos en paralelo
+                const [respuesta] = await Promise.all([
+                    getData1()
+                ]);
+                
+                const annualData = respuesta["annualDataRaw"]  
+                const monthlyData = respuesta["monthlyDataRaw"]
+                const weeklyData = respuesta["weeklyDataRaw"]
+                
+                // Asignar datos a variables globales
+                annualDataRaw = annualData;
+                monthlyDataRaw = monthlyData;
+                weeklyDataRaw = weeklyData;
+                crimeTypes = [...new Set(annualDataRaw.map(d => d.Delito))].sort();
+                
+                // Inicializar componentes
+                populateCrimeSelects();
+                generateGeneralAnalysisText();
+                updateKeyMetrics();
+                renderAnnualChart('All');
+                generateAnalysisText('Annual', 'All');
+                
+                // Ocultar overlay de carga
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error al cargar los datos:', error);
+                // Mostrar mensaje de error
+                document.getElementById('loadingOverlay').innerHTML = 
+                    `<div class="text-center">
+                        <div class="text-red-500 text-5xl mb-4">⚠️</div>
+                        <p class="text-xl font-semibold text-red-700">Error al cargar los datos</p>
+                        <p class="text-gray-600 mt-2">Por favor, intenta recargar la página más tarde.</p>
+                        <button onclick="location.reload()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                            Recargar página
+                        </button>
+                    </div>`;
+            }
+        }
+        
+        // Iniciar la aplicación cuando el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
 </html>
