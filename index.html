@@ -1,0 +1,354 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Medidas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #eef2f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1280px;
+            margin: auto;
+            padding: 2rem;
+        }
+        .card-container {
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .card-container:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .progress-bar {
+            height: 1.5rem;
+            border-radius: 9999px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            transition: width 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.75rem;
+            color: white;
+            font-weight: bold;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        }
+        .accordion-content.open {
+            max-height: 1500px; /* Increased max-height for larger content */
+            padding-top: 1.5rem;
+        }
+        .accordion-button svg {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-button.open svg {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <!-- Main title with modern typography -->
+        <h1 class="text-5xl font-extrabold text-center text-blue-700 mb-8 tracking-tight">
+            Análisis de Medidas de Sostenibilidad
+        </h1>
+
+        <!-- Filter section with clean, modern design -->
+        <nav class="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-200">
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 md:space-x-6">
+                <!-- Group of filters -->
+                <div class="flex flex-col md:flex-row flex-wrap items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
+                    <!-- Nested Filter 1: Tipo de Medida -->
+                    <div class="flex flex-col space-y-2">
+                        <label for="filter-tipo-medida" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-1.447.894L8 14.072V11.414L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                            </svg>
+                            Tipo de Medida
+                        </label>
+                        <select id="filter-tipo-medida" class="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+                            <option value="Todos">Todos</option>
+                        </select>
+                    </div>
+                    <!-- Nested Filter 2: Transformaciones -->
+                    <div class="flex flex-col space-y-2">
+                        <label for="filter-transformaciones" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M11 3a1 1 0 100 2h1a1 1 0 100-2h-1z" />
+                                <path fill-rule="evenodd" d="M4 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H4zm1 2h8v12H5V5zm10 0v12h-8V5h8z" clip-rule="evenodd" />
+                            </svg>
+                            Transformaciones
+                        </label>
+                        <select id="filter-transformaciones" class="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+                            <option value="Todos">Todos</option>
+                        </select>
+                    </div>
+                    <!-- Nested Filter 3: Region -->
+                    <div class="flex flex-col space-y-2">
+                        <label for="filter-region" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.002 6.002 0 019.336 0l.27.482a.5.5 0 01-.433.741H4.5a.5.5 0 01-.434-.741l.266-.482z" clip-rule="evenodd" />
+                            </svg>
+                            Región
+                        </label>
+                        <select id="filter-region" class="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+                            <option value="Todos">Todos</option>
+                        </select>
+                    </div>
+                    <!-- Nested Filter 4: Comuna -->
+                    <div class="flex flex-col space-y-2">
+                        <label for="filter-comuna" class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                            </svg>
+                            Comuna
+                        </label>
+                        <select id="filter-comuna" class="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+                            <option value="Todos">Todos</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Reset button with a clean style -->
+                <button id="reset-filters" class="p-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-300 w-full md:w-auto mt-4 md:mt-0 shadow-sm">
+                    Reiniciar Filtros
+                </button>
+            </div>
+        </nav>
+
+        <!-- Cards Container -->
+        <div id="cards-container" class="grid grid-cols-1 gap-6"></div>
+    </div>
+
+    <script>
+        // Updated data provided by the user
+        const data = {"Medida":{"0":"Fomento de producción y consumo local de producción agrícola sostenible","1":"Mejorar la gestión y eficiencia del uso del agua a nivel domiciliario y de espacios públicos en zonas urbanas y rurales","2":"Aumentar la valorización de residuos orgánicos generados a nivel comunal","3":"Medida de fortalecimiento para la agenda climática del Municipio","4":"Mejorar la gestión y eficiencia del uso del agua a nivel domiciliario y de espacios públicos en zonas urbanas y rurales","5":"Aumento del uso sostenible y eficiente de los recursos hídricos en el sector agropecuario","6":"Fortalecimiento para la agenda climática del Municipio","7":"Fomento de producción y consumo local de producción agrícola sostenible"},"Tipo de medida":{"0":"Adaptación - Mitigación","1":"Adaptación","2":"Mitigación","3":"Transversal","4":"Adaptación","5":"Adaptación","6":"Transversal","7":"Adaptación - Mitigación"},"Acciones":{"0":"Desarrollo Económico Verde 1.1","1":"Seguridad Hídrica 1.1","2":"Economía Circular 1.5","3":"Transversal 2","4":"Seguridad Hídrica 1.9","5":"Seguridad Hídrica 2.1","6":"Transversal 2","7":"Desarrollo Económico Verde 1.1"},"Descripción de la accion":{"0":"Coordinar con productores locales para la creación de un mercados campesino a través de la postulación a financiamiento de Indap","1":"Identificar geoespacialmente todas las viviendas urbanas y rurales sin acceso a fuentes de agua mejorada. (donde fuente mejorada implica que está ubicada dentro de la vivienda o en el patio o parcela de la misma, está disponible en el momento en que se la necesita y cumple con los estándares para contaminantes fecales y químicos prioritarios)","2":"Generar las instancias para el aprovechamiento del compost por terceros a través de convenios o contratos, o por la misma municipalidad.","3":"Continuar con el convenio con el Ministerio del Medio Ambiente en su programa de certificación ambiental municipal.","4":"Implementar un programa de monitoreo y mantención de sistemas de riego.","5":"Levantar información y sistematizar listado de productores agrícolas de la comuna en base a tamaño de propietario, con el objetivo de focalizar esfuerzos de apoyo en la postulación a fondos concursables.","6":"Continuar con el convenio con el Ministerio del Medio Ambiente en su programa de certificación ambiental municipal.","7":"Difusión a través de una charla informativa respecto de programas de agricultura sostenible de Indap"},"Área municipal responsable":{"0":"Oficina de Desarrollo Rural","1":"Unidad de Medio Ambiente","2":"Departamento de Medio Ambiente, Dirección de Operaciones","3":"SECPLAN","4":"Unidad de Medio Ambiente","5":"Fomento Productivo","6":"Secplan","7":"Unidad de Desarrollo Rural - Proder (municipal)"},"Colaboradores":{"0":"Indap (Prodesal, PDTI), INIA, SAG","1":"Seremi MINVU Conaf Comités APR Dideco Municipalidad","2":"Gobierno Regional, Asociación de Municipalidades de la Región de Los Ríos para el Manejo Sustentable de Residuos y la Gestión Ambiental","3":"Gobierno Regional","4":"Seremi de Vivienda y Urbanismo (Minvu), Conaf, MOP - DGA y Subdirección de Servicios Sanitarios Rurales, Senapred y comités de APR.","5":"INIA, Conadi, Comisión Nacional de Riego (CNR) e Indap. Productores agropecuarios","6":"Gobierno Regional","7":"Indap (Prodesal y PDTI), INIA, SAG, Escuela Agroecológica Lumaco"},"Posibles fuentes de financiamiento":{"0":"Financiamiento sectorial del Ministerio de Agricultura para la implementación de mercados campesinos, transferencia de conocimientos y prácticas.","1":"Fondos GORE (FNDR, FRIL FIC-R) - Fondos Subdere - Programa Mejoramiento Urbano y equipamiento comunal (PMU) - Fondos MOP (programas específicos del MOP para mejorar la infraestructura hídrica y tecnológica, programa de financiamiento APR) - Fondos propios del municipio","2":"Presupuesto sectorial de la Subsecretaría de Desarrollo Regional a través de su Programa de Mejoramiento de Barrios (PMB) Gobierno Regional a través del FNDR o del Fondo Regional de Interés Local (FRIL) Presupuesto sectorial del Ministerio del Medio Ambiente a través de su Fondo para el Reciclaje (FPR)","3":"Presupuesto municipal y del Gobierno Regional","4":"Fondos GORE (FNDR, FRIL FIC-R). Fondos Subdere (Programa de Mejoramiento Urbano y Equipamiento Comunal, PMU). Fondos MOP (programas específicos del MOP para mejorar la infraestructura hídrica y tecnológica, programa de financiamiento APR). Fondos propios del municipio.","5":"Financiamiento sectorial los ministerios de Agricultura (Indap, INIA y CNR), de Desarrollo Social y Familia (Conadi), y de Economía, Fomento y Turismo (Corfo).","6":"Presupuesto municipal y del Gobierno Regional","7":"Financiamiento sectorial del Ministerio de Agricultura para la implementación de mercados campesinos- transferencia de conocimientos y prácticas."},"Otros medios de implementación":{"0":"Gestionar estrategia de difusión para la promoción del consumo de productos locales producidos bajo prácticas de agricultura sostenible. Coordinar con servicios que realicen capacitaciones a productores de la comuna.","1":"Coordinación con Comités de APR en la comuna y diagnóstico del estado de sus instalaciones en cuanto al nivel de eficiencia hídrica y pérdidas en los sistemas. Actualización del PRC, urbanizando zonas densamente pobladas con escasez hídrica sin infraestructura de agua potable y alcantarillado. Desarrollo de un Plan Regulador Intercomunal que incorpore las zonas rurales con riesgo de escasez hídrica.","2":"Educación sobre el buen uso de las composteras y el seguimiento a los usuarios es crítico para el éxito de la medida. Identificación de los principales generadores de residuos orgánicos y coordinación para que entreguen sus residuos.Identificación y coordinación de instancias para el uso del compost.","3":"Creación de Convenio de Programación Territorial con el GORE de carácter plurianual, estableciendo presupuestos y objetivos por el plazo establecido en el PACCC.","4":"Coordinación con comités de APR en la comuna y diagnóstico del estado de los mismos, en cuanto al nivel de eficiencia hídrica y pérdidas en los sistemas. Actualización de PRC considerando escasez hídrica como factor en el Estudio de Factibilidad Sanitaria, limitando o aumentando las densidades y capacidad de uso de suelo de acuerdo a la oferta hídrica existente. Incorporar en Plan Regulador Intercomunal de Borde Costero y en PROT las zonas rurales con riesgo de escasez hídrica.","5":"Coordinación con productores locales de diversos tamaños, usando las instancias de coordinación existentes o creando nuevas.","6":"Creación de convenio de programación territorial con el Gore, de carácter plurianual, estableciendo presupuestos y objetivos por el plazo establecido en el PACCC. Elaboración del PROT y PRI Borde Costero. Asegurar la participación de representantes de la Municipalidad en todas las instancias del Corecc, para posicionar y relevar los objetivos y medidas del PACCC","7":"Gestionar estrategia de difusión para la promoción del consumo de productos locales producidos bajo prácticas de agricultura sostenible de los mercados campesinos existentes. Coordinar con servicios que realicen capacitaciones a productores de la comuna."},"Indicadores de orientación":{"0":"Indicador 1 Número de agricultores que aplican prácticas sostenibles en la producción agrícola","1":"Porcentaje de viviendas con soluciones implementadas, en base al total identificado en Seguridad Hídrica 1.1","2":"Indicador compostaje Cantidad de residuos orgánicos valorizados","3":"Indicador Convenio de Programación Territorial con el Gobierno Regional aprobado por resolución.","4":null,"5":"Número de productores con infraestructura de riego eficiente y\\/o captación de aguas lluvia.","6":"Convenio de programación territorial con el Gobierno Regional aprobado por resolución.","7":"Número de agricultores que aplican prácticas sostenibles en la producción agropecuaria"},"Medio de verificación":{"0":"Actas de reuniones establecidas.","1":"Información SIG disponible","2":"Convenios o contratos firmados, y\\/o registro del uso del compost por parte de la municipalidad.","3":"Convenio vigente","4":"Programa de monitoreo y mantención disponible","5":"Sistematización de productores por tamaño, localidad y tipo de riego","6":"Convenio vigente","7":"Registros de la realización de charla informativa"},"Plazo máximo":{"0":2030,"1":2026,"2":2027,"3":2030,"4":2030,"5":2030,"6":2030,"7":2030},"Costo":{"0":"$0","1":null,"2":"$0","3":null,"4":"$4.788.000","5":"$9.000.000","6":"$11,500,000","7":"$0"},"Transformaciones":{"0":"Potenciar la economía verde","1":"Fortalecer la seguridad hídrica","2":"Economía circular","3":"Medida Transversal","4":"Fortalecer la seguridad hídrica","5":"Fortalecer la seguridad hídrica","6":"Medida Transversal","7":"Potenciar la economía verde"},"Comuna":{"0":"Corral","1":"Futrono","2":"Lanco","3":"La Unión","4":"Máfil","5":"Máfil","6":"Mariquina","7":"Paillaco"},"Pagina donde empiezas a extraer la informacion de la fila":{"0":150,"1":185,"2":219,"3":262,"4":178,"5":178,"6":255,"7":136},"region":{"0":"Los Lagos","1":"Metropolitana","2":"Metropolitana","3":"Valparaiso","4":"Los Rios","5":"Los Rios","6":"Ñuble","7":"Araucania"}};
+        
+        
+        // Transforma los datos en un formato de array más usable
+        const transformedData = Object.keys(data.Medida).map(key => ({
+            medida: data.Medida[key],
+            tipoMedida: data['Tipo de medida'][key],
+            acciones: data.Acciones[key],
+            descripcion: data['Descripción de la accion'][key],
+            areaResponsable: data['Área municipal responsable'][key],
+            colaboradores: data.Colaboradores[key],
+            fuentesFinanciamiento: data['Posibles fuentes de financiamiento'][key],
+            otrosMedios: data['Otros medios de implementación'][key],
+            indicadores: data['Indicadores de orientación'][key],
+            medioVerificacion: data['Medio de verificación'][key],
+            plazoMaximo: data['Plazo máximo'][key],
+            costo: data.Costo[key],
+            transformaciones: data.Transformaciones[key],
+            region: data.region[key], // Added region
+            comuna: data.Comuna[key],
+            porcentaje: 20 // Porcentaje de avance por defecto para los nuevos datos
+        }));
+
+        const cardsContainer = document.getElementById('cards-container');
+        const filterTipoMedida = document.getElementById('filter-tipo-medida');
+        const filterTransformaciones = document.getElementById('filter-transformaciones');
+        const filterRegion = document.getElementById('filter-region'); // New filter
+        const filterComuna = document.getElementById('filter-comuna');
+        const resetButton = document.getElementById('reset-filters');
+
+        // Mapeo de colores basado en el tipo de medida
+        const colorMap = {
+            'Adaptación - Mitigación': { headerBg: 'bg-green-600', headerText: 'text-white', contentBg: 'bg-green-100', icon: 'text-white' },
+            'Adaptación': { headerBg: 'bg-blue-800', headerText: 'text-white', contentBg: 'bg-blue-100', icon: 'text-white' },
+            'Mitigación': { headerBg: 'bg-orange-600', headerText: 'text-white', contentBg: 'bg-orange-100', icon: 'text-white' },
+            'Transversal': { headerBg: 'bg-purple-600', headerText: 'text-white', contentBg: 'bg-purple-100', icon: 'text-white' }
+        };
+
+        // Función para renderizar los cards basados en los datos filtrados
+        function renderCards(dataToRender) {
+            cardsContainer.innerHTML = '';
+            const groupedData = dataToRender.reduce((acc, current) => {
+                if (!acc[current.medida]) acc[current.medida] = [];
+                acc[current.medida].push(current);
+                return acc;
+            }, {});
+
+            Object.keys(groupedData).forEach(medidaTitle => {
+                const actions = groupedData[medidaTitle];
+                const tipoMedida = actions[0].tipoMedida;
+                const colors = colorMap[tipoMedida] || { headerBg: 'bg-gray-700', headerText: 'text-white', contentBg: 'bg-gray-50', icon: 'text-white' };
+
+                const accordionItem = document.createElement('div');
+                accordionItem.className = `rounded-2xl shadow-xl card-container overflow-hidden`;
+
+                const accordionHeader = document.createElement('button');
+                accordionHeader.className = `accordion-button w-full flex items-center justify-between p-6 cursor-pointer focus:outline-none ${colors.headerBg}`;
+                accordionHeader.innerHTML = `
+                    <h2 class="text-xl md:text-2xl font-bold ${colors.headerText}">${medidaTitle}</h2>
+                    <svg class="w-6 h-6 ${colors.icon} transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                `;
+
+                const accordionContent = document.createElement('div');
+                accordionContent.className = `accordion-content px-6 ${colors.contentBg}`;
+
+                actions.forEach(action => {
+                    const actionCard = document.createElement('div');
+                    actionCard.className = 'rounded-lg p-5 mb-5 border border-gray-200 transition-all duration-300 transform hover:shadow-lg';
+                    actionCard.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+
+                    const detailsList = document.createElement('ul');
+                    detailsList.className = 'list-none space-y-3 text-sm md:text-base text-gray-700';
+
+                    const addDetail = (label, value) => {
+                        if (!value) return; // Do not add empty details
+                        const listItem = document.createElement('li');
+                        listItem.className = 'flex items-start'; // Align items to the start for long text
+                        const spanLabel = document.createElement('span');
+                        spanLabel.className = 'font-semibold w-40 flex-shrink-0 mr-2 text-gray-900';
+                        spanLabel.textContent = `${label}:`;
+                        const spanValue = document.createElement('span');
+                        spanValue.textContent = value;
+                        listItem.appendChild(spanLabel);
+                        listItem.appendChild(spanValue);
+                        detailsList.appendChild(listItem);
+                    };
+
+                    addDetail('Región', action.region);
+                    addDetail('Comuna', action.comuna);
+                    addDetail('Transformaciones', action.transformaciones);
+                    addDetail('Tipo de Medida', action.tipoMedida);
+                    addDetail('Acciones', action.acciones);
+                    addDetail('Descripción', action.descripcion);
+                    addDetail('Área Responsable', action.areaResponsable);
+                    addDetail('Colaboradores', action.colaboradores);
+                    addDetail('Plazo Máximo', action.plazoMaximo);
+                    addDetail('Costo', action.costo);
+
+                    actionCard.appendChild(detailsList);
+
+                    const progressBarContainer = document.createElement('div');
+                    progressBarContainer.className = 'mt-5';
+                    const progressBarLabel = document.createElement('p');
+                    progressBarLabel.className = 'text-sm font-semibold text-gray-700 mb-2';
+                    progressBarLabel.textContent = 'Porcentaje de Avance';
+                    const progressBar = document.createElement('div');
+                    progressBar.className = 'progress-bar';
+                    const progressFill = document.createElement('div');
+                    progressFill.className = 'progress-fill';
+                    progressFill.style.width = `${action.porcentaje}%`;
+                    progressFill.textContent = `${action.porcentaje}%`;
+                    progressBar.appendChild(progressFill);
+                    progressBarContainer.appendChild(progressBarLabel);
+                    progressBarContainer.appendChild(progressBar);
+                    actionCard.appendChild(progressBarContainer);
+
+                    accordionContent.appendChild(actionCard);
+                });
+
+                accordionItem.appendChild(accordionHeader);
+                accordionItem.appendChild(accordionContent);
+                cardsContainer.appendChild(accordionItem);
+
+                accordionHeader.addEventListener('click', () => {
+                    document.querySelectorAll('.accordion-content.open').forEach(content => {
+                        if (content !== accordionContent) {
+                            content.classList.remove('open');
+                            content.previousElementSibling.classList.remove('open');
+                        }
+                    });
+                    accordionContent.classList.toggle('open');
+                    accordionHeader.classList.toggle('open');
+                });
+            });
+        }
+
+        // Función para actualizar las opciones de un select, preservando la selección si es posible
+        function updateSelectOptions(selectElement, newValues) {
+            const currentValue = selectElement.value;
+            selectElement.innerHTML = '<option value="Todos">Todos</option>'; // Reset with "Todos"
+            // Crea un conjunto de valores únicos para evitar duplicados
+            const uniqueValues = [...new Set(newValues)].sort();
+            uniqueValues.forEach(value => {
+                if (value) {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectElement.appendChild(option);
+                }
+            });
+            // Si el valor seleccionado anteriormente todavía existe en la nueva lista de opciones, mantenlo. Si no, resetea a 'Todos'.
+            selectElement.value = uniqueValues.includes(currentValue) ? currentValue : 'Todos';
+        }
+
+        // --- CORRECTED LOGIC ---
+        // Función principal para aplicar filtros y actualizar opciones en cascada
+        function applyFilters() {
+            // Obtener todas las selecciones actuales
+            const selectedTipoMedida = filterTipoMedida.value;
+            const selectedTransformaciones = filterTransformaciones.value;
+            const selectedRegion = filterRegion.value;
+            const selectedComuna = filterComuna.value;
+
+            // 1. Filtrar datos para las opciones de 'Transformaciones'
+            const dataForTransformaciones = transformedData.filter(item =>
+                selectedTipoMedida === 'Todos' || item.tipoMedida === selectedTipoMedida
+            );
+            updateSelectOptions(filterTransformaciones, dataForTransformaciones.map(item => item.transformaciones));
+
+            // 2. Filtrar datos para las opciones de 'Región'
+            const dataForRegion = dataForTransformaciones.filter(item =>
+                selectedTransformaciones === 'Todos' || item.transformaciones === selectedTransformaciones
+            );
+            updateSelectOptions(filterRegion, dataForRegion.map(item => item.region));
+
+            // 3. Filtrar datos para las opciones de 'Comuna'
+            const dataForComuna = dataForRegion.filter(item =>
+                selectedRegion === 'Todos' || item.region === selectedRegion
+            );
+            updateSelectOptions(filterComuna, dataForComuna.map(item => item.comuna));
+
+            // 4. Filtrado final para renderizar las tarjetas
+            const finalDataToRender = dataForComuna.filter(item =>
+                selectedComuna === 'Todos' || item.comuna === selectedComuna
+            );
+            renderCards(finalDataToRender);
+        }
+        
+        // Función para inicializar los filtros al cargar la página
+        function initializeFilters() {
+            updateSelectOptions(filterTipoMedida, transformedData.map(item => item.tipoMedida));
+            updateSelectOptions(filterTransformaciones, transformedData.map(item => item.transformaciones));
+            updateSelectOptions(filterRegion, transformedData.map(item => item.region));
+            updateSelectOptions(filterComuna, transformedData.map(item => item.comuna));
+        }
+
+        // Event listeners para los filtros
+        filterTipoMedida.addEventListener('change', applyFilters);
+        filterTransformaciones.addEventListener('change', applyFilters);
+        filterRegion.addEventListener('change', applyFilters);
+        filterComuna.addEventListener('change', applyFilters);
+        
+        // Event listener para el botón de reinicio
+        resetButton.addEventListener('click', () => {
+            filterTipoMedida.value = 'Todos';
+            filterTransformaciones.value = 'Todos';
+            filterRegion.value = 'Todos';
+            filterComuna.value = 'Todos';
+            // Vuelve a aplicar los filtros, lo que repoblará los dropdowns con todas las opciones
+            applyFilters();
+        });
+
+        // Inicializa los filtros y renderiza los cards al cargar la página
+        initializeFilters();
+        applyFilters();
+
+    </script>
+</body>
+</html>
